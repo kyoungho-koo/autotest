@@ -7,24 +7,52 @@ import statistics
 import PyGnuplot as pg
 import numpy as np
 from operator import itemgetter
+import time
+import os
+import errno
 
+#
+# run filebench varmail workload and store log in log directory
+#
 def run_benchmark(type):
+    currentTimestr = time.strftime("log/%Y%m%d%H%M/")
+
+    if not os.path.exists(currentTimestr):
+        try:
+            os.makedirs(currentTimestr)
+        except OSError as exc:
+            if exc.errno != errno.EEXIST:
+                raise
+
+
+    kernlog_file = open(currentTimestr+"kern.log","w+")
+    benchRet_file = open(currentTimestr+"varmail.log","w+")
+
+
     subprocess.run(["sudo","sh","shell/init_filebench_test.sh"])
-    subprocess.run(["sudo","filebench","-f","workload/varmail.f"])
+    subprocess.run(["sudo","filebench","-f","workload/varmail.f"],stdout=benchRet_file)
+
+    get_kernel_log = subprocess.Popen(["cat","/var/log/kern.log"], stdout=subprocess.PIPE)
+    grep_test_log = subprocess.Popen(["grep", "t_updates"], stdin=get_kernel_log.stdout, stdout=subprocess.PIPE)
+    get_kernel_log.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
+    
+    kernlog = grep_test_log.communicate()[0].decode('utf8')
+    kernlog_file.write(kernlog)
+    
+    kernlog_filter = filter(None,kernlog.split('\n'))
+
+    return kernlog_filter
+
     
 
-def parse_dmesg(type):
-    p1 = subprocess.Popen(["cat","log/jbd2_journal_commit_transaction/004.txt"], stdout=subprocess.PIPE)
-    p2 = subprocess.Popen(["grep", "t_updates"], stdin=p1.stdout, stdout=subprocess.PIPE)
-    p1.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
-    output = filter(None,p2.communicate()[0].decode('utf8').split('\n'))
+def parse_dmesg(type, kernlog_filter):
 
     list = []
     x = []
     y = []
     z = []
     count = 0
-    for data in output:
+    for data in kernlog_filter:
         tmp = literal_eval(data[49:-1])
         if tmp['critical_time'] >30000000: 
             count += 1
@@ -87,8 +115,8 @@ if __name__ == '__main__':
         pg.c("plot [:33] [:] 'tmp.out' u 1:2 lc rgb 'black' t 'dot'")
 
     elif gArg.plot_type == 'median':
-        run_benchmark(1);
-        y,z,average,max_t_updates = parse_dmesg(1)
+        kernlog_filter = run_benchmark(1);
+        y,z,average,max_t_updates = parse_dmesg(1,kernlog_filter)
         print ( 'average' , average )
         x = np.arange(max_t_updates)
         pg.s([x,z], filename='tmp.out')

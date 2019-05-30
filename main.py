@@ -9,8 +9,8 @@ import numpy as np
 from operator import itemgetter
 
 def run_benchmark(type):
-    kernel_log = open('/var/log/kern.log','w')
-    print( "line : %d" % kernel_log.write('a'))
+    subprocess.run(["sudo","sh","shell/init_filebench_test.sh"])
+    subprocess.run(["sudo","filebench","-f","workload/varmail.f"])
     
 
 def parse_dmesg(type):

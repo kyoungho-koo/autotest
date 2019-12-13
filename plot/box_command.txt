@@ -1,0 +1,7 @@
+set xtics ("16" 0.5 ,"32" 1.5,)
+
+set boxwidth 0.25
+set style fill solid
+
+plot 'data.dat' using 1:2:0 with boxes lc variable
+

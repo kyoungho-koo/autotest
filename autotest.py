@@ -14,7 +14,7 @@ import errno
 #
 # run filebench varmail workload and store log in log directory
 #
-def run_benchmark(type):
+def run_benchmark(workload, numOfTry, thread):
     currentTimestr = time.strftime("log/%Y%m%d%H%M/")
 
     if not os.path.exists(currentTimestr):
@@ -25,23 +25,23 @@ def run_benchmark(type):
                 raise
 
 
-    kernlog_file = open(currentTimestr+"kern.log","w+")
-    benchRet_file = open(currentTimestr+"varmail.log","w+")
+#    kernlog_file = open(currentTimestr+"kern.log","w+")
+#    benchRet_file = open(currentTimestr+"varmail.log","w+")
 
 
-    subprocess.run(["sudo","sh","shell/init_filebench_test.sh"])
-    subprocess.run(["sudo","filebench","-f","workload/varmail.f"],stdout=benchRet_file)
+#    subprocess.run(["sudo","sh","shell/init_filebench_test.sh"])
+#    subprocess.run(["sudo","filebench","-f","workload/varmail.f"],stdout=benchRet_file)
 
-    get_kernel_log = subprocess.Popen(["cat","/var/log/kern.log"], stdout=subprocess.PIPE)
-    grep_test_log = subprocess.Popen(["grep", "t_updates"], stdin=get_kernel_log.stdout, stdout=subprocess.PIPE)
-    get_kernel_log.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
+#    get_kernel_log = subprocess.Popen(["cat","/var/log/kern.log"], stdout=subprocess.PIPE)
+#    grep_test_log = subprocess.Popen(["grep", "t_updates"], stdin=get_kernel_log.stdout, stdout=subprocess.PIPE)
+#    get_kernel_log.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
     
-    kernlog = grep_test_log.communicate()[0].decode('utf8')
-    kernlog_file.write(kernlog)
+#    kernlog = grep_test_log.communicate()[0].decode('utf8')
+#    kernlog_file.write(kernlog)
     
-    kernlog_filter = filter(None,kernlog.split('\n'))
+#    kernlog_filter = filter(None,kernlog.split('\n'))
 
-    return kernlog_filter
+#    return kernlog_filter
 
     
 
@@ -94,9 +94,13 @@ if __name__ == '__main__':
       dot''')
     parser.add_argument('--y-range',default='',type=str )
     parser.add_argument('--x-range',default='',type=str )
+    parser.add_argument('--filebench',default='',type=str)
 
 
     gArg = parser.parse_args()
+
+    if gArg.filebench == 'varmail':
+
 
     plot_str = "plot"
     plot_str += " [:"+gArg.x_range + "]"

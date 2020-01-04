@@ -3,7 +3,6 @@
 #echo 0 > /sys/module/jbd2/parameters/jbd2_debug
 #cat /sys/module/jbd2/parameters/jbd2_debug
 
-
 #
 STORAGE='nvme0n1'
 
@@ -33,6 +32,8 @@ for i in 16 48
 
   #free all data in memory
   free -h && sync && sh -c 'echo 3 > /proc/sys/vm/drop_caches' && free -h
+
+
 
   filebench -f workload/varmail$i.f >> output/${STORAGE}thread$i.txt 
  done

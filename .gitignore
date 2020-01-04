@@ -1,4 +1,7 @@
 /log/
 *.out
 mnt/
-
+output/graph/
+data/fop_experiments/
+output/
+data/

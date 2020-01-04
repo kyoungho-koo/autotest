@@ -1,0 +1,141 @@
+WARNING: --num-threads is deprecated, use --threads instead
+WARNING: --max-time is deprecated, use --time instead
+sysbench 1.0.11 (using system LuaJIT 2.1.0-beta3)
+
+Running the test with following options:
+Number of threads: 20
+Initializing random number generator from current time
+
+
+Extra file open flags: 0
+128 files, 1.1719GiB each
+150GiB total file size
+Block size 16KiB
+Number of IO requests: 0
+Read/Write ratio for combined random IO test: 1.50
+Calling fsync() after each write operation.
+Using synchronous I/O mode
+Doing random r/w test
+Initializing worker threads...
+
+Threads started!
+
+
+File operations:
+    reads/s:                      4474.64
+    writes/s:                     2983.22
+    fsyncs/s:                     2983.22
+
+Throughput:
+    read, MiB/s:                  69.92
+    written, MiB/s:               46.61
+
+General statistics:
+    total time:                          60.0032s
+    total number of events:              447521
+
+Latency (ms):
+         min:                                  0.01
+         avg:                                  2.68
+         max:                                 31.72
+         95th percentile:                      7.84
+         sum:                            1198197.79
+
+Threads fairness:
+    events (avg/stddev):           22376.0500/95.88
+    execution time (avg/stddev):   59.9099/0.00
+
+WARNING: --num-threads is deprecated, use --threads instead
+WARNING: --max-time is deprecated, use --time instead
+sysbench 1.0.11 (using system LuaJIT 2.1.0-beta3)
+
+Running the test with following options:
+Number of threads: 20
+Initializing random number generator from current time
+
+
+Extra file open flags: 0
+128 files, 1.1719GiB each
+150GiB total file size
+Block size 16KiB
+Number of IO requests: 0
+Read/Write ratio for combined random IO test: 1.50
+Calling fsync() after each write operation.
+Using synchronous I/O mode
+Doing random r/w test
+Initializing worker threads...
+
+Threads started!
+
+
+File operations:
+    reads/s:                      4480.67
+    writes/s:                     2987.23
+    fsyncs/s:                     2987.23
+
+Throughput:
+    read, MiB/s:                  70.01
+    written, MiB/s:               46.68
+
+General statistics:
+    total time:                          60.0003s
+    total number of events:              448102
+
+Latency (ms):
+         min:                                  0.01
+         avg:                                  2.67
+         max:                                 30.88
+         95th percentile:                      7.84
+         sum:                            1198150.68
+
+Threads fairness:
+    events (avg/stddev):           22405.1000/93.60
+    execution time (avg/stddev):   59.9075/0.00
+
+WARNING: --num-threads is deprecated, use --threads instead
+WARNING: --max-time is deprecated, use --time instead
+sysbench 1.0.11 (using system LuaJIT 2.1.0-beta3)
+
+Running the test with following options:
+Number of threads: 20
+Initializing random number generator from current time
+
+
+Extra file open flags: 0
+128 files, 1.1719GiB each
+150GiB total file size
+Block size 16KiB
+Number of IO requests: 0
+Read/Write ratio for combined random IO test: 1.50
+Calling fsync() after each write operation.
+Using synchronous I/O mode
+Doing random r/w test
+Initializing worker threads...
+
+Threads started!
+
+
+File operations:
+    reads/s:                      4483.28
+    writes/s:                     2989.04
+    fsyncs/s:                     2989.04
+
+Throughput:
+    read, MiB/s:                  70.05
+    written, MiB/s:               46.70
+
+General statistics:
+    total time:                          60.0055s
+    total number of events:              448406
+
+Latency (ms):
+         min:                                  0.01
+         avg:                                  2.67
+         max:                                 34.63
+         95th percentile:                      7.70
+         sum:                            1198207.78
+
+Threads fairness:
+    events (avg/stddev):           22420.3000/90.25
+    execution time (avg/stddev):   59.9104/0.00
+

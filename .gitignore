@@ -2,3 +2,4 @@
 *.out
 mnt/
 .log/
+*.log

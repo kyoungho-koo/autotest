@@ -25,6 +25,9 @@ def run_benchmark(workload, numOfTry, thread):
                 raise
 
 
+def run_benchmark(bench):
+    subprocess.run(["sudo","sh","autotestlib/shell/start_"+bench+".sh"])
+    
 #    kernlog_file = open(currentTimestr+"kern.log","w+")
 #    benchRet_file = open(currentTimestr+"varmail.log","w+")
 
@@ -95,11 +98,16 @@ if __name__ == '__main__':
     parser.add_argument('--y-range',default='',type=str )
     parser.add_argument('--x-range',default='',type=str )
     parser.add_argument('--filebench',default='',type=str)
+    parser.add_argument('--bench',default='',type=str)
+
+    if gArg.plot_type == 'sysbench':
+        run_bench("sysbench");
+
 
 
     gArg = parser.parse_args()
 
-    if gArg.filebench == 'varmail':
+    #if gArg.filebench == 'varmail':
 
 
     plot_str = "plot"

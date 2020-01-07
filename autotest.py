@@ -103,8 +103,11 @@ if __name__ == '__main__':
 	gArg = parser.parse_args()
 
 	if gArg.bench == 'sysbench':
-		run_bench("sysbench");
-		print ("sysbench running")
+            run_bench("sysbench");
+        elif gArg.bench == 'dbench':
+            run_bench("dbench")
+        elif gArg.bench == 'filebench':
+            run_bench("filebench")
 
 
 

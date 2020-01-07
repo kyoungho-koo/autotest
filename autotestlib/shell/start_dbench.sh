@@ -20,11 +20,11 @@ fi
 echo $KERNEL_VERSION
 echo $KERNEL_EXTRAVERSION
 
-BENCHMARK="sysbench"
-OPERATION="rndwr"
-FILESIZE="150G"
+BENCHMARK="dbench"
 TIME="60"
 VERSION=${KER_EXTRAVER1}_${KER_EXTRAVER2}
+WORKLOAD="client"
+
 if [ "$KER_EXTRAVER2" = "" ];
 then
 	if [  "$KER_EXTRAVER1" = "" ];
@@ -35,7 +35,7 @@ then
 	fi
 fi
 
-OUTDIR="$(pwd)/data/${BENCHMARK}/${VERSION}/${OPERATION}/${FILESIZE}"
+OUTDIR="$(pwd)/data/${BENCHMARK}/${VERSION}/${WORKLOAD}"
 echo $OUTDIR
 mkdir -p -- $OUTDIR
 
@@ -43,59 +43,55 @@ mkdir -p -- $OUTDIR
 #for STORAGE in nvme0n1 sdd1 sdc1 sdb1
 for STORAGE in nvme0n1 
 do
-  echo ======== $STORAGE ========
-  for i in 1 10 20 30 40 50
+  echo ============ $STORAGE =================
+  for PROCESS in 1 10 20 30 40 50
   do
-    for  j in `seq 1 ${ITERATION}`
+   for THREAD in 1 2 3 4 5
+   do
+	  for  j in `seq 1 ${ITERATION}`
 	  do
-	    CHECK=$(umount mnt 2>&1 | grep busy);
-	    echo $CHECK
-	    if [ "$CHECK" = "" ]; then 
-	      echo -- UMOUNT COMPLETE 
-	    else
-	      echo !!!!UMOUNT FAIL!!!!
-	      fuser -ck mnt
-	      CHECK1=$(umount -l mnt 2>&1 | grep busy);
-	      if [ "$CHECK1" = "" ]; then 
-		echo -- UMOUNT COMPLETE 
-	      else
-		echo !!!!UMOUNT FAIL!!!!
-		exit 0
-	      fi
-	    fi
-	    echo y | mkfs.ext4 -E lazy_itable_init=0,lazy_journal_init=0 /dev/$STORAGE;
+		 CHECK=$(umount mnt 2>&1 | grep busy);
+		 echo $CHECK
+		 if [ "$CHECK" = "" ]; then 
+		   echo -- UMOUNT COMPLETE 
+		 else
+		   echo !!!!UMOUNT FAIL!!!!
+		   fuser -ck mnt
+		   CHECK1=$(umount -l mnt 2>&1 | grep busy);
+		   if [ "$CHECK1" = "" ]; then 
+		 echo -- UMOUNT COMPLETE 
+		   else
+		 echo !!!!UMOUNT FAIL!!!!
+		 exit 0
+		   fi
+		 fi
+		 echo y | mkfs.ext4 -E lazy_itable_init=0,lazy_journal_init=0 /dev/$STORAGE;
 
-	    ## data journaling mode
-	    #mount -o data=journal /dev/nvme0n1p1 /home/dertflag/mnt
+		 ## data journaling mode
+		 #mount -o data=journal /dev/nvme0n1p1 /home/dertflag/mnt
 
-	    mount /dev/$STORAGE mnt;
-	    cd mnt;
+		 mount /dev/$STORAGE mnt;
+		 cd mnt;
 
-	    ## free all data in memory
-	    free -h && sync && sh -c 'echo 3 > /proc/sys/vm/drop_caches' && free -h;
+		 ## free all data in memory
+		 free -h && sync && sh -c 'echo 3 > /proc/sys/vm/drop_caches' && free -h;
 
-	    ## prepare benchmark 
-	    ${BENCHMARK} --test=fileio --file-total-size=${FILESIZE} prepare
 
-            ## Delete Kernel Log
-            echo > /dev/null | sudo tee /var/log/kern.log
-            sudo sync
-	    
-            ## Define OUTFILE
-	    OUTFILE=${OUTDIR}/${STORAGE}thread$i;
+		 ## Delete Kernel Log
+		 echo > /dev/null | sudo tee /var/log/kern.log
+		 sudo sync
+	  
+		 ## Define OUTFILE
+		 OUTFILE=${OUTDIR}/${STORAGE}thread$i;
 
-	    ${BENCHMARK} --test=fileio --file-total-size=${FILESIZE} \
-			 --file-test-mode=$OPERATION --file-fsync-all=on \
-			 --num-threads=$i --max-time=${TIME} \
-			 --max-requests=0 run >> ${OUTFILE};
-	    cd ..;
+		 ${BENCHMARK} -c workload/${WORKLOAD}.txt -D $(pwd)/mnt -t ${TIME} ${PROCESS} -F --clients-per-process=${THREAD}
+		 cd ..;
 
-	    # sysbench --test=fileio --file-total-size=20G cleanup
 
-            cp /var/log/kern.log ${OUTFILE}.log;
-            sudo chown $USER:$USER ${OUTFILE}.log;
-            chmod 755 ${OUTFILE}.log;
-
+		 cp /var/log/kern.log ${OUTFILE}.log;
+		 sudo chown $USER:$USER ${OUTFILE}.log;
+		 chmod 755 ${OUTFILE}.log;
+	  done
 	done
   done
 done

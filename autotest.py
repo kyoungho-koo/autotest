@@ -25,8 +25,13 @@ def run_benchmark(workload, numOfTry, thread):
                 raise
 
 
+def run_shell(shell, stdin, params):
+    script = "autotestlib/shell/"+shell
+    subprocess.run(["sudo","sh",script])
+
+
 def run_bench(bench):
-    subprocess.run(["sudo","sh","autotestlib/shell/start_"+bench+".sh"])
+    run_shell("start_"+bench+".sh","","")
     
 #    kernlog_file = open(currentTimestr+"kern.log","w+")
 #    benchRet_file = open(currentTimestr+"varmail.log","w+")
@@ -91,65 +96,88 @@ def parse_dmesg(type, kernlog_filter):
         
 
 if __name__ == '__main__':
-	parser = argparse.ArgumentParser(prog='main.py', formatter_class=argparse.RawTextHelpFormatter,
-	    description="""analysis : test""")
-	parser.add_argument('--plot-type',default='',type=str ,help = '''  median
-	dot''')
-	parser.add_argument('--y-range',default='',type=str )
-	parser.add_argument('--x-range',default='',type=str )
-	parser.add_argument('--filebench',default='',type=str)
-	parser.add_argument('--bench',default='',type=str)
-
-	gArg = parser.parse_args()
-
-	if gArg.bench == 'sysbench':
-            run_bench("sysbench");
-        elif gArg.bench == 'dbench':
-            run_bench("dbench")
-        elif gArg.bench == 'filebench':
-            run_bench("filebench")
+    parser = argparse.ArgumentParser(prog='main.py', formatter_class=argparse.RawTextHelpFormatter,
+        description="""analysis : test""")
+    parser.add_argument('--plot-type',default='',type=str ,help = '''  median
+    dot''')
+    parser.add_argument('--y-range',default='',type=str )
+    parser.add_argument('--x-range',default='',type=str )
+    parser.add_argument('--filebench',default='',type=str)
+    parser.add_argument('--bench',default='',type=str)
+    parser.add_argument('--hyper-thread',default='',type=str)
 
 
+    gArg = parser.parse_args()
 
-
-	#if gArg.filebench == 'varmail':
-
-
-	plot_str = "plot"
-	plot_str += " [:"+gArg.x_range + "]"
-	plot_str += " [:"+gArg.y_range + "]"
-	plot_str += " 'tmp.out' u 1:2"
-	plot_value = " lc rgb \#000 t"
-
-
-	if gArg.plot_type == 'dot':  
-		x,y = parse_dmesg(0)
-		pg.s([x,y], filename='tmp.out')
-		pg.c('set title "Execution time for the number of access threads"; set xlabel "Access Thread Number"; set ylabel "Millisecond"')
-		pg.c('set grid')
-		plot_str += plot_value+" '"+gArg.plot_type+"'"
-		#pg.c(plot_str)
-		pg.c("plot [:33] [:] 'tmp.out' u 1:2 lc rgb 'black' t 'dot'")
-
-	elif gArg.plot_type == 'median':
-		kernlog_filter = run_benchmark(1);
-		y,z,average,max_t_updates = parse_dmesg(1,kernlog_filter)
-		print ( 'average' , average )
-		x = np.arange(max_t_updates)
-		pg.s([x,z], filename='tmp.out')
-		pg.c('set title "Execution time for the number of access threads"; set xlabel "Access Thread Number"; set ylabel "Millisecond"')
-		pg.c('set grid')
-		plot_str += " w l"+plot_value+" '"+gArg.plot_type+"'"
-		#pg.c(plot_str)
-		pg.c("plot [:] [:] 'tmp.out' u 1:2 w l lc rgb 'black' t 'median'")
-
-	else:
-		print ("Invalid plot type" + gArg.plot_type)
-
+    if gArg.hyper_thread == 'on':
+        ht_on = subprocess.Popen(["echo","e"], stdout=subprocess.PIPE)
+        ht_toggle = subprocess.Popen(["sudo", "sh","autotestlib/shell/toggle_ht.sh"], stdin=ht_on.stdout, stdout=subprocess.PIPE)
+        log = ht_toggle.communicate()[0].decode('utf8')
+        ht_toggle.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
+        print(log)
     
-    #print(y)
- #   with open(,'r') as fin:
- #       for line in fin:
+
+    elif gArg.hyper_thread == 'off':
+        ht_off = subprocess.Popen(["echo","d"], stdout=subprocess.PIPE)
+        ht_toggle = subprocess.Popen(["sudo", "sh","autotestlib/shell/toggle_ht.sh"], stdin=ht_off.stdout, stdout=subprocess.PIPE)
+        log = ht_toggle.communicate()[0].decode('utf8')
+        ht_toggle.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
+        print(log)
+ 
+    else:
+        print("i----")
+
+
+    if gArg.bench == 'sysbench':
+        run_bench("sysbench")
+    elif gArg.bench == 'dbench':
+        run_bench("dbench")
+    elif gArg.bench == 'filebench':
+        run_bench("filebench")
+    else:
+        print()
+
+
+
+
+#if gArg.filebench == 'varmail':
+
+
+    plot_str = "plot"
+    plot_str += " [:"+gArg.x_range + "]"
+    plot_str += " [:"+gArg.y_range + "]"
+    plot_str += " 'tmp.out' u 1:2"
+    plot_value = " lc rgb \#000 t"
+
+
+    if gArg.plot_type == 'dot':  
+        x,y = parse_dmesg(0)
+        pg.s([x,y], filename='tmp.out')
+        pg.c('set title "Execution time for the number of access threads"; set xlabel "Access Thread Number"; set ylabel "Millisecond"')
+        pg.c('set grid')
+        plot_str += plot_value+" '"+gArg.plot_type+"'"
+#pg.c(plot_str)
+        pg.c("plot [:33] [:] 'tmp.out' u 1:2 lc rgb 'black' t 'dot'")
+
+    elif gArg.plot_type == 'median':
+        kernlog_filter = run_benchmark(1);
+        y,z,average,max_t_updates = parse_dmesg(1,kernlog_filter)
+        print ( 'average' , average )
+        x = np.arange(max_t_updates)
+        pg.s([x,z], filename='tmp.out')
+        pg.c('set title "Execution time for the number of access threads"; set xlabel "Access Thread Number"; set ylabel "Millisecond"')
+        pg.c('set grid')
+        plot_str += " w l"+plot_value+" '"+gArg.plot_type+"'"
+#pg.c(plot_str)
+        pg.c("plot [:] [:] 'tmp.out' u 1:2 w l lc rgb 'black' t 'median'")
+
+    else:
+        print ("Invalid plot type" + gArg.plot_type)
+
+
+#print(y)
+#   with open(,'r') as fin:
+#       for line in fin:
 
 
 '''

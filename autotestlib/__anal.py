@@ -37,7 +37,7 @@ def analysis(lines):
 
 
     for line in lines:
-        cur_time = float(line[1:line.find(']')])
+        cur_time = float(line[line.find('[')+1:line.find(']')])
 
         # Manipulate Iteration
         if count > ITERATION:
@@ -106,14 +106,14 @@ def analysis(lines):
 from tempfile import TemporaryFile
 
 for thread in ['16','48']:
-    outfile = 'output/fop_exp' + thread + '.csv'
+    outfile = 'output/fop_exp_varmail' + thread + '.csv'
     outRet = [[] for y in range(4)] 
     for i in range(DIVIDE_PER_GRAPH):
         outRet[0].append(i + 1)
     iterator = 1
-    for filename in ['840pro','850pro','optane']:
+    for filename in ['sdc1','sdd1','nvme0n1']:
         Lines = []
-        directory = 'data/fop_experiments/'+ filename + thread + ".txt"
+        directory = 'data/varmail/fop_log/'+ filename + "thread"+thread + ".txt"
         print(directory)
         with open(directory,'r') as f:
             Lines = f.readlines()

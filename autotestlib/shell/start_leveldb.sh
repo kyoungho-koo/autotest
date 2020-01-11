@@ -75,7 +75,7 @@ do
             ## Define OUTFILE
 	    OUTFILE=${OUTDIR}/${STORAGE}thread$i;
 
-	    ${BENCHMARK} --db=mnt/ --threads=$i >> ${OUTFILE};
+	    ${BENCHMARK} --db=mnt/ --threads=$i --benchmarks=fillsync >> ${OUTFILE};
 
             cp /var/log/kern.log ${OUTFILE}.log;
             sudo chown $USER:$USER ${OUTFILE}.log;

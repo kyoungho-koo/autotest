@@ -35,7 +35,7 @@ then
 	fi
 fi
 
-OUTDIR="$(pwd)/data/${BENCHMARK}/${VERSION}/${OPERATION}/${FILESIZE}"
+OUTDIR="$(pwd)/data/${BENCHMARK}/${VERSION}"
 echo $OUTDIR
 mkdir -p -- $OUTDIR
 

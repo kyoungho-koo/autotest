@@ -1,10 +1,10 @@
 set term pdfcairo size 10in, 5in font "Helvetica,30"
 
 in1 = "output/fop_exp48.csv"
-out1 = "figure1.eps"
+out1 = "figure2_48.eps"
 
 set xrange [0:]
-set yrange [0:]
+set yrange [0:35]
 
 set xlabel "Normalized Commit Time" font "Helvetica, 30"
 set ylabel "% of File Oper." font "Helvetica, 30"

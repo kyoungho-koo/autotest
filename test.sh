@@ -1,8 +1,16 @@
-CHECK=$(echo sh | grep busy)
 
-echo $CHECK
-if [ "$CHECK" = "" ]; then
-  echo "haha"
-else
-  echo "dd"
-fi;
+bench()
+{
+ echo $1
+}
+
+loop()
+{
+  for i in $*
+  do
+   $1 $7$i
+  done
+}
+
+
+loop $(loop bench 1 2 3 4 5 A) 1 2 3 4 5 B 

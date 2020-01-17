@@ -10,6 +10,7 @@ from operator import itemgetter
 import time
 import os
 import errno
+from autotestlib import *
 
 #
 # run filebench varmail workload and store log in log directory
@@ -31,8 +32,12 @@ def run_shell(shell, stdin, params):
 
 
 def run_bench(bench):
-    run_shell("start_"+bench+".sh","","")
-    
+    run_shell("__start_"+bench+".sh","","")
+
+def run_bench(filename, param_list):
+    print("RUN Bench",filename ,param_list);
+
+   
 #    kernlog_file = open(currentTimestr+"kern.log","w+")
 #    benchRet_file = open(currentTimestr+"varmail.log","w+")
 
@@ -104,7 +109,11 @@ if __name__ == '__main__':
     parser.add_argument('--x-range',default='',type=str )
     parser.add_argument('--filebench',default='',type=str)
     parser.add_argument('--bench',default='',type=str)
-    parser.add_argument('--hyper-thread',default='',type=str)
+    parser.add_argument('--hyper-thread',default='on',type=str)
+
+    parser.add_argument('--device', nargs='+', default=[])
+    parser.add_argument('--process', nargs='+', default=[])
+    parser.add_argument('--filesize', nargs='+', default=[])
 
 
     gArg = parser.parse_args()
@@ -123,9 +132,6 @@ if __name__ == '__main__':
         log = ht_toggle.communicate()[0].decode('utf8')
         ht_toggle.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
         print(log)
- 
-    else:
-        print("i----")
 
 
     if gArg.bench == 'sysbench':
@@ -136,12 +142,16 @@ if __name__ == '__main__':
         run_bench("filebench")
     else:
         print()
+        matrix = [
+                     ["device","nvme0n1","sdd1","sdc1"],
+                     ["client",1 ,2 ,3 ,4 ,5],
+                     ["process",2 ,4 ,5 ,8],
+                 ]
 
-
+        Experiments(matrix,run_bench).run()
 
 
 #if gArg.filebench == 'varmail':
-
 
     plot_str = "plot"
     plot_str += " [:"+gArg.x_range + "]"
